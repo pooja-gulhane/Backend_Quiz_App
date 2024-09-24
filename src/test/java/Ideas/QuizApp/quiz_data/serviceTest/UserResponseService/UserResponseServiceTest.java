@@ -1,4 +1,4 @@
-package Ideas.QuizApp.quiz_data.UserResponseService;
+package Ideas.QuizApp.quiz_data.serviceTest.UserResponseService;
 
 
 import Ideas.QuizApp.quiz_data.DTO.ApplicationUser.ApplicationUserRegisterDTO;
@@ -8,7 +8,7 @@ import Ideas.QuizApp.quiz_data.DTO.UserResponse.*;
 import Ideas.QuizApp.quiz_data.DTO.quiztaken.QuestionResponseProjection;
 import Ideas.QuizApp.quiz_data.DTO.quiztaken.ScoreDTO;
 import Ideas.QuizApp.quiz_data.entity.*;
-import Ideas.QuizApp.quiz_data.projectionutils.MockUtils;
+import Ideas.QuizApp.quiz_data.serviceTest.projectionutils.MockUtils;
 import Ideas.QuizApp.quiz_data.repository.*;
 import Ideas.QuizApp.quiz_data.services.UserResponseService;
 import org.junit.jupiter.api.BeforeEach;
@@ -140,6 +140,7 @@ public class UserResponseServiceTest {
         when(userResponseRepository.save(any(UserResponse.class)))
                 .thenReturn(buildUserResponse);
     }
+
 
     private void setupMockQuizTakenRepository() {
         when(quizTakenRepository.save(any(QuizTaken.class)))
@@ -286,11 +287,6 @@ private ApplicationUserRegisterDTO buildApplicationUserRegisterDTO() {
                 .build();
     }
 
-//    private QuizTaken buildMockQuizTaken(){
-//        ApplicationUser applicationUser = new ApplicationUser(1,null,null,null,null,null,null,null);
-//        Quiz quiz = new Quiz(1,null,null,null,null,null,null,null);
-//        return new QuizTaken(1,applicationUser, quiz, 10, null);
-//    }
 
     private QuizTaken buildMockQuizTaken() {
         ApplicationUser applicationUser = ApplicationUser.builder()

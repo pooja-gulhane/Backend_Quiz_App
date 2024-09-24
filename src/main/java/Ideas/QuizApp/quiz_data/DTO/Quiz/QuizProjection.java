@@ -6,4 +6,5 @@ public interface QuizProjection {
     Integer getQuizTotalMarks();
     Integer getQuizTimeAllocated();
     String getQuizName();
+    String getQuizImage();
 }

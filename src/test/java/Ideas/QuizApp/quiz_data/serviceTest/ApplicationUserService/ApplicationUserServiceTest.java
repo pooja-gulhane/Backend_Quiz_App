@@ -1,4 +1,4 @@
-package Ideas.QuizApp.quiz_data.ApplicationUserService;
+package Ideas.QuizApp.quiz_data.serviceTest.ApplicationUserService;
 
 import Ideas.QuizApp.quiz_data.DTO.ApplicationUser.ApplicationUserRegisterDTO;
 import Ideas.QuizApp.quiz_data.controller.ApplicationUserController;

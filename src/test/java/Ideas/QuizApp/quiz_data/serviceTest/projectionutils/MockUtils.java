@@ -1,4 +1,4 @@
-package Ideas.QuizApp.quiz_data.projectionutils;
+package Ideas.QuizApp.quiz_data.serviceTest.projectionutils;
 
 import Ideas.QuizApp.quiz_data.DTO.ApplicationUser.UserDTO;
 import Ideas.QuizApp.quiz_data.DTO.Question.DisplayQuestionDTO;

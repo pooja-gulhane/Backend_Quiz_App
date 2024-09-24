@@ -1,4 +1,4 @@
-package Ideas.QuizApp.quiz_data.QuizService;
+package Ideas.QuizApp.quiz_data.serviceTest.QuizService;
 
 import Ideas.QuizApp.quiz_data.DTO.Quiz.QuizDTO;
 import Ideas.QuizApp.quiz_data.DTO.Quiz.QuizProjection;
@@ -8,7 +8,7 @@ import Ideas.QuizApp.quiz_data.entity.Quiz;
 import Ideas.QuizApp.quiz_data.entity.QuizTaken;
 import Ideas.QuizApp.quiz_data.exception.QuizAlreadyExists;
 import Ideas.QuizApp.quiz_data.exception.ResourceNotFound;
-import Ideas.QuizApp.quiz_data.projectionutils.MockUtils;
+import Ideas.QuizApp.quiz_data.serviceTest.projectionutils.MockUtils;
 import Ideas.QuizApp.quiz_data.repository.ApplicationUserRepository;
 import Ideas.QuizApp.quiz_data.repository.QuizRepository;
 import Ideas.QuizApp.quiz_data.repository.QuizTakenRepository;

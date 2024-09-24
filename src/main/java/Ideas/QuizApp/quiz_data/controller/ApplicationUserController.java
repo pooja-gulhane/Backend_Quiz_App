@@ -2,6 +2,7 @@ package Ideas.QuizApp.quiz_data.controller;
 
 import Ideas.QuizApp.quiz_data.DTO.ApplicationUser.ApplicationUserLoginDTO;
 import Ideas.QuizApp.quiz_data.DTO.ApplicationUser.ApplicationUserRegisterDTO;
+import Ideas.QuizApp.quiz_data.DTO.ApplicationUser.UserDTO;
 import Ideas.QuizApp.quiz_data.DTO.DisplayUserHistoryDTO;
 import Ideas.QuizApp.quiz_data.DTO.Quiz.QuizDTO;
 import Ideas.QuizApp.quiz_data.entity.ApplicationUser;
@@ -11,6 +12,7 @@ import Ideas.QuizApp.quiz_data.exception.InvalidCredentialsException;
 import Ideas.QuizApp.quiz_data.exception.ResourceNotFound;
 import Ideas.QuizApp.quiz_data.repository.ApplicationUserRepository;
 import Ideas.QuizApp.quiz_data.roles.Roles;
+import Ideas.QuizApp.quiz_data.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,15 +23,16 @@ import java.util.Optional;
 
 @CrossOrigin("*")
 @RestController
-@RequestMapping("/users")
 public class ApplicationUserController {
 
     @Autowired
     private ApplicationUserRepository applicationUserRepository;
     @Autowired
     PasswordEncoder passwordEncoder;
+    @Autowired
+    JwtUtil jwtUtil;
 
-    @GetMapping("/{id}")
+    @GetMapping("/users/{id}")
     public ResponseEntity<ApplicationUserRegisterDTO> getUserById(@PathVariable("id") int applicationUserId) {
         Optional<ApplicationUser> userOptional = applicationUserRepository.findById(applicationUserId);
         if (userOptional.isPresent()) {
@@ -42,7 +45,7 @@ public class ApplicationUserController {
     }
 
 
-    @PostMapping("/register")
+    @PostMapping("/users/register")
     public ApplicationUser registerStudent(@RequestBody ApplicationUser applicationUser) {
         System.out.println("Hello World");
         if (applicationUserRepository.existsByApplicationUserEmail(applicationUser.getApplicationUserEmail())) {
@@ -58,7 +61,7 @@ public class ApplicationUserController {
         return (applicationUserRepository.save(applicationUser));
     }
 
-    @PostMapping("/login")
+    @PostMapping("/users/login")
     public ApplicationUser loginStudent(@RequestBody ApplicationUserRegisterDTO applicationUser) {
         Optional<ApplicationUser> existingUser = applicationUserRepository.findByApplicationUserEmailAndApplicationUserPassword(applicationUser.getApplicationUserEmail(), applicationUser.getApplicationUserPassword());
 
@@ -69,7 +72,7 @@ public class ApplicationUserController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/users/{id}")
     public ApplicationUserRegisterDTO updateApplicationUser(@PathVariable("id") int applicationUserId, @RequestBody ApplicationUser applicationUser) {
 
         applicationUser.setApplicationUserId(applicationUserId);
@@ -81,6 +84,14 @@ public class ApplicationUserController {
             return toApplicationDTO(applicationUserRepository.save(applicationUser));
         }
         throw new ResourceNotFound("User Id not Found");
+    }
+
+    @GetMapping("/users")
+    public UserDTO getCurrentUser(@RequestHeader("Authorization") String authorizationHeader) {
+        String jwt = authorizationHeader.substring(7);
+        String username = jwtUtil.extractUsername(jwt);
+        System.out.println(username);
+        return applicationUserRepository.findByApplicationUserEmail(username);
     }
 
     private ApplicationUserRegisterDTO toApplicationDTO(ApplicationUser applicationUser) {

@@ -17,7 +17,4 @@ public interface QuestionRepository extends CrudRepository<Question, Integer> {
     @Query(value = "Select count(q.question_id) as totalQuestions from Question q where q.quiz_id = ?1",nativeQuery = true)
     Integer findCountByQuizId(Integer quizId);
 
-    Question findByQuestionId(Integer questionId);
-
-    // List<DisplayQuestionDTO> findByQuiz(Quiz quiz);
 }
