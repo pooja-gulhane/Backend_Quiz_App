@@ -18,14 +18,14 @@ public class UserResponseController {
 
     @PostMapping("/quiz/next")
     public CurrentResponseDTO saveCurrentResponseAndGetNext(@RequestBody CurrentAndNextResponseDTO currentAndNextResponseDTO) {
-        // Delegate the logic to the service class
-        return userResponseService.saveCurrentResponseAndGetNext(currentAndNextResponseDTO);
+        userResponseService.saveCurrentResponse(currentAndNextResponseDTO.getCurrentResponse());
+        return userResponseService.getNextResponseIfPresent(currentAndNextResponseDTO.getNextResponse());
     }
 
     @PostMapping("/quiz/previous")
     public CurrentResponseDTO saveCurrentResponseAndGetPrevious(@RequestBody CurrentAndPreviousResponseDTO currentAndPreviousResponseDTO) {
-        // Delegate the logic to the service class
-        return userResponseService.saveCurrentResponseAndGetPrevious(currentAndPreviousResponseDTO);
+        userResponseService.saveCurrentResponse(currentAndPreviousResponseDTO.getCurrentResponse());
+        return userResponseService.getPreviousResponseIfPresent(currentAndPreviousResponseDTO.getPreviousResponse());
     }
 
     @PostMapping("/userResponses")

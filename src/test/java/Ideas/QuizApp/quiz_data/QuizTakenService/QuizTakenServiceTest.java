@@ -42,37 +42,45 @@ public class QuizTakenServiceTest {
     void testGetUserQuizHistory_UserExists_ShouldReturnQuizHistory() {
         // Arrange
         int applicationUserId = 1;
-        ApplicationUser mockUser = new ApplicationUser();
-        mockUser.setApplicationUserId(applicationUserId);
+        ApplicationUser mockUser = createMockUser(applicationUserId);
 
-        // Mock ApplicationUserRepository
+        // Mock the repositories
         when(applicationUserRepository.findById(applicationUserId)).thenReturn(Optional.of(mockUser));
 
-        // Mock UserQuizDetailsDTO
-        UserQuizDetailsDTO mockQuizDetails = MockUtils.mockUserQuizDetailsDTO(100, 1, "Math Quiz", 1, "Pooja", "Gulhane");
-        assertEquals(mockQuizDetails.getQuiz().getQuizId(),1);
-        assertEquals(mockQuizDetails.getQuiz().getQuizName(),"Math Quiz");
-        assertEquals(mockQuizDetails.getApplicationUser().getApplicationUserId(),1);
-        assertEquals(mockQuizDetails.getApplicationUser().getApplicationUserFirstName(),"Pooja");
-        assertEquals(mockQuizDetails.getApplicationUser().getApplicationUserLastName(),"Gulhane");
-        assertEquals(mockQuizDetails.getScoreValue(),100);
-
-        // Mock QuizTakenRepository
+        UserQuizDetailsDTO mockQuizDetails = createMockQuizDetails();
         when(quizTakenRepository.findByApplicationUser(mockUser)).thenReturn(List.of(mockQuizDetails));
 
         // Act
         List<UserQuizDetailsDTO> quizHistory = quizTakenService.getUserQuizHistory(applicationUserId);
 
         // Assert
-        assertNotNull(quizHistory);
-        assertEquals(1, quizHistory.size());
-        assertEquals(100, quizHistory.get(0).getScoreValue());
-        assertEquals("Math Quiz", quizHistory.get(0).getQuiz().getQuizName());
-        assertEquals("Pooja", quizHistory.get(0).getApplicationUser().getApplicationUserFirstName());
-
-        // Verify that the repository method was called
+        verifyQuizHistory(quizHistory);
         verify(quizTakenRepository, times(1)).findByApplicationUser(mockUser);
     }
+
+    // Helper function to create mock user
+    private ApplicationUser createMockUser(int applicationUserId) {
+        ApplicationUser mockUser = new ApplicationUser();
+        mockUser.setApplicationUserId(applicationUserId);
+        return mockUser;
+    }
+
+    // Helper function to create mock quiz details
+    private UserQuizDetailsDTO createMockQuizDetails() {
+        return MockUtils.mockUserQuizDetailsDTO(100, 1, "Math Quiz", 1, "Pooja", "Gulhane");
+    }
+
+    // Helper function to verify quiz history assertions
+    private void verifyQuizHistory(List<UserQuizDetailsDTO> quizHistory) {
+        assertNotNull(quizHistory);
+        assertEquals(1, quizHistory.size());
+
+        UserQuizDetailsDTO quizDetails = quizHistory.get(0);
+        assertEquals(100, quizDetails.getScoreValue());
+        assertEquals("Math Quiz", quizDetails.getQuiz().getQuizName());
+        assertEquals("Pooja", quizDetails.getApplicationUser().getApplicationUserFirstName());
+    }
+
 
     @Test
     void testGetUserQuizHistory_UserNotFound_ShouldThrowResourceNotFoundException() {

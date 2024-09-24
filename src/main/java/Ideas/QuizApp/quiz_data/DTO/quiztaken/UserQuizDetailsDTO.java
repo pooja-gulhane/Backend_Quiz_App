@@ -1,5 +1,7 @@
 package Ideas.QuizApp.quiz_data.DTO.quiztaken;
 
+import Ideas.QuizApp.quiz_data.DTO.Quiz.QuizProjection;
+
 import java.time.LocalDateTime;
 
 public interface UserQuizDetailsDTO {
@@ -8,12 +10,6 @@ public interface UserQuizDetailsDTO {
     LocalDateTime getQuizTakenDate();
     QuizProjection getQuiz();
     UserProjection getApplicationUser();
-
-    interface QuizProjection {
-        Integer getQuizId();
-        String getQuizName();
-        Integer getQuizTotalMarks();
-    }
 
     interface UserProjection {
         Integer getApplicationUserId();

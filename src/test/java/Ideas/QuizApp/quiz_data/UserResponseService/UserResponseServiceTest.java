@@ -4,10 +4,7 @@ package Ideas.QuizApp.quiz_data.UserResponseService;
 import Ideas.QuizApp.quiz_data.DTO.ApplicationUser.ApplicationUserRegisterDTO;
 import Ideas.QuizApp.quiz_data.DTO.Question.QuestionDTO;
 import Ideas.QuizApp.quiz_data.DTO.Quiz.QuizDTO;
-import Ideas.QuizApp.quiz_data.DTO.UserResponse.CurrentAndNextResponseDTO;
-import Ideas.QuizApp.quiz_data.DTO.UserResponse.CurrentResponseDTO;
-import Ideas.QuizApp.quiz_data.DTO.UserResponse.DisplayUserResponseDTO;
-import Ideas.QuizApp.quiz_data.DTO.UserResponse.SubmitUserResponseDTO;
+import Ideas.QuizApp.quiz_data.DTO.UserResponse.*;
 import Ideas.QuizApp.quiz_data.DTO.quiztaken.QuestionResponseProjection;
 import Ideas.QuizApp.quiz_data.DTO.quiztaken.ScoreDTO;
 import Ideas.QuizApp.quiz_data.entity.*;
@@ -26,7 +23,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 
@@ -56,139 +54,151 @@ public class UserResponseServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
+
     @Test
-    void testSaveCurrentResponseAndGetNext() {
-        CurrentAndNextResponseDTO mockedCurrentAndNextResponseDTO = buildCurrentAndNextResponseDTO();
-
-        when(userResponseRepository.existsByQuizAndApplicationUserAndQuestion(any(Quiz.class), any(ApplicationUser.class), any(Question.class))).thenReturn(true);
-        CurrentResponseDTO mockedCurrentResponseDTO = MockUtils.mockCurrentResponseProjection(1, "Integer", 1, "What is", "String", "Boolean", "Integer","Double",1,"pooja@gmail.com","pooja@123","Student",1,10,20,10,"EVS");
-
-        when(userResponseRepository.findByQuizAndApplicationUserAndQuestion(any(Quiz.class),any(ApplicationUser.class),any(Question.class))).thenReturn(mockedCurrentResponseDTO);
+    void testSaveCurrentResponseAndGetPrevious() {
+        // Arrange
+        CurrentAndPreviousResponseDTO mockedCurrentAndPreviousResponseDTO = buildCurrentAndPreviousResponseDTO();
+        CurrentResponseDTO mockedCurrentResponseDTO = mockCurrentResponseDTO();
         UserResponse mockedUserResponse = buildUserResponse();
-        when(userResponseRepository.findById(any(Integer.class))).thenReturn(Optional.of(mockedUserResponse));
 
+        // Mock repository behavior
+        when(userResponseRepository.existsByQuizAndApplicationUserAndQuestion(any(Quiz.class), any(ApplicationUser.class), any(Question.class))).thenReturn(true);
+        when(userResponseRepository.findByQuizAndApplicationUserAndQuestion(any(Quiz.class), any(ApplicationUser.class), any(Question.class))).thenReturn(mockedCurrentResponseDTO);
+        when(userResponseRepository.findById(any())).thenReturn(Optional.of(mockedUserResponse));
         when(userResponseRepository.save(mockedUserResponse)).thenReturn(mockedUserResponse);
 
-        CurrentResponseDTO actualCurrentResponseDTO = userResponseService.saveCurrentResponseAndGetNext(mockedCurrentAndNextResponseDTO);
+        // Act
+        userResponseService.saveCurrentResponse(mockedCurrentAndPreviousResponseDTO.getCurrentResponse());
+        CurrentResponseDTO previousResponseDTO = userResponseService.getPreviousResponseIfPresent(mockedCurrentAndPreviousResponseDTO.getPreviousResponse());
 
+        // Assert
+        assertNotNull(previousResponseDTO);
+        assertEquals(mockedCurrentResponseDTO, previousResponseDTO);
+    }
+
+
+    @Test
+    void testSaveCurrentResponseAndGetNext() {
+        // Arrange
+        CurrentAndNextResponseDTO mockedCurrentAndNextResponseDTO = buildCurrentAndNextResponseDTO();
+        CurrentResponseDTO mockedCurrentResponseDTO = mockCurrentResponseDTO();
+        UserResponse mockedUserResponse = buildUserResponse();
+
+        // Mock repository behavior
+        when(userResponseRepository.existsByQuizAndApplicationUserAndQuestion(any(Quiz.class), any(ApplicationUser.class), any(Question.class))).thenReturn(true);
+        when(userResponseRepository.findByQuizAndApplicationUserAndQuestion(any(Quiz.class), any(ApplicationUser.class), any(Question.class))).thenReturn(mockedCurrentResponseDTO);
+        when(userResponseRepository.findById(any(Integer.class))).thenReturn(Optional.of(mockedUserResponse));
+        when(userResponseRepository.save(mockedUserResponse)).thenReturn(mockedUserResponse);
+
+        // Act
+        userResponseService.saveCurrentResponse(mockedCurrentAndNextResponseDTO.getCurrentResponse());
+        CurrentResponseDTO actualCurrentResponseDTO = userResponseService.getNextResponseIfPresent(mockedCurrentAndNextResponseDTO.getNextResponse());
+
+        // Assert
         assertNotNull(actualCurrentResponseDTO);
-
-        assertEquals(mockedCurrentResponseDTO.getUserResponseId(),actualCurrentResponseDTO.getUserResponseId());
-        assertEquals(mockedCurrentResponseDTO.getUserResponseAns(),actualCurrentResponseDTO.getUserResponseAns());
-        assertEquals(mockedCurrentResponseDTO.getApplicationUser(),actualCurrentResponseDTO.getApplicationUser());
-        assertEquals(mockedCurrentResponseDTO.getQuiz(),actualCurrentResponseDTO.getQuiz());
-        assertEquals(mockedCurrentResponseDTO.getQuestion(),actualCurrentResponseDTO.getQuestion());
+        assertEquals(mockedCurrentResponseDTO, actualCurrentResponseDTO); // Assuming you override equals method in DTO
     }
 
-    private QuestionDTO buildQuestionDTO() {
-        return new QuestionDTO(1, "What is ", "String", "Boolean", "Integer", "Double", "Integer", 2);
-    }
-
-    private ApplicationUserRegisterDTO buildApplicationUserRegisterDTO() {
-        return new ApplicationUserRegisterDTO(1, "Pooja", "Gulhane", "pooja@gmail.com", "pooja@123", "STUDENT");
-    }
-
-    private QuizDTO buildQuizDTO() {
-        return new QuizDTO(1, 10, 20, 10, "EVS",null);
-    }
-
-    private UserResponse buildUserResponse()
-    {
-        return new UserResponse(1,null,null,"Integer",0,null,true);
-    }
-
-    private SubmitUserResponseDTO buildSubmitUserResponseDTO() {
-        QuestionDTO questionDTO = buildQuestionDTO();
-        ApplicationUserRegisterDTO applicationUserRegisterDTO = buildApplicationUserRegisterDTO();
-        QuizDTO quizDTO = buildQuizDTO();
-        return new SubmitUserResponseDTO(questionDTO, applicationUserRegisterDTO, "Integer", quizDTO);
-    }
-
-    private CurrentAndNextResponseDTO buildCurrentAndNextResponseDTO() {
-        SubmitUserResponseDTO currentResponse = buildSubmitUserResponseDTO();
-        SubmitUserResponseDTO nextResponse = buildSubmitUserResponseDTO();
-        return new CurrentAndNextResponseDTO(currentResponse, nextResponse);
-    }
 
     @Test
     public void testSubmitUserResponses_ShouldCalculateScoreAndSaveQuizTaken() {
         // Arrange
-        Integer userId = 1;
-        Integer quizId = 1;
-        ApplicationUser user = new ApplicationUser();
-        user.setApplicationUserId(userId);
-        Quiz quiz = new Quiz();
-        quiz.setQuizId(quizId);
+        ApplicationUserRegisterDTO mockUser = buildApplicationUserRegisterDTO();
+        QuizDTO mockQuiz = buildQuizDTO();
+        CurrentAndNextResponseDTO mockResponseDTO = buildCurrentAndNextResponseDTO();
 
-        CurrentAndNextResponseDTO mockedCurrentAndNextResponseDTO = buildCurrentAndNextResponseDTO();
+        setupMockUserResponseRepository();
+        setupMockQuizTakenRepository();
 
-        when(userResponseRepository.existsByQuizAndApplicationUserAndQuestion(any(Quiz.class), any(ApplicationUser.class), any(Question.class))).thenReturn(true);
-        CurrentResponseDTO mockedCurrentResponseDTO = MockUtils.mockCurrentResponseProjection(1, "Integer", 1, "What is", "String", "Boolean", "Integer","Double",1,"pooja@gmail.com","pooja@123","Student",1,10,20,10,"EVS");
-        when(userResponseRepository.findByQuizAndApplicationUserAndQuestion(any(Quiz.class),any(ApplicationUser.class),any(Question.class))).thenReturn(mockedCurrentResponseDTO);
+        // Act
+        ScoreDTO result = userResponseService.submitUserResponses(mockResponseDTO);
 
-        QuestionResponseProjection questionResponseProjection = MockUtils.mockQuestionResponseProjection("Integer", 1, true, 1, "Integer", 2);
-        QuestionResponseProjection.QuestionProjection mockedProjection = questionResponseProjection.getQuestion();
-        assertEquals(questionResponseProjection.getIsCorrect(), true);
-        assertEquals(questionResponseProjection.getQuestion().getQuestionId(),1);
-        assertEquals(questionResponseProjection.getQuestion().getQuestionMarks(),2);
-        assertEquals(questionResponseProjection.getQuestion().getQuestionCorrectAns(),"Integer");
-        assertEquals(questionResponseProjection.getUserResponseId(),1);
-        assertEquals(questionResponseProjection.getUserResponseAns(),"Integer");
-        assertEquals(questionResponseProjection.getQuestion(), mockedProjection);
+        // Assert
+        verifyInteractionsWithRepositories();
+        assertNotNull(result); // Additional assertions can be added as needed
+    }
 
+
+    private void setupMockUserResponseRepository() {
+        when(userResponseRepository.existsByQuizAndApplicationUserAndQuestion(any(Quiz.class), any(ApplicationUser.class), any(Question.class)))
+                .thenReturn(true);
+
+        CurrentResponseDTO mockCurrentResponseDTO = mockCurrentResponseDTO();
+        when(userResponseRepository.findByQuizAndApplicationUserAndQuestion(any(Quiz.class), any(ApplicationUser.class), any(Question.class)))
+                .thenReturn(mockCurrentResponseDTO);
+
+        QuestionResponseProjection questionResponseProjection =MockUtils.mockQuestionResponseProjection();
         when(userResponseRepository.findByApplicationUserAndQuiz(any(ApplicationUser.class), any(Quiz.class)))
                 .thenReturn(List.of(questionResponseProjection));
 
-        UserResponse userResponse = new UserResponse();
-        userResponse.setUserResponseId(1);
-        when(userResponseRepository.findById(anyInt())).thenReturn(Optional.of(userResponse));
-        when(userResponseRepository.save(any(UserResponse.class))).thenReturn(userResponse);
+        UserResponse buildUserResponse =buildUserResponse();
+        when(userResponseRepository.findById(anyInt()))
+                .thenReturn(Optional.of(buildUserResponse));
 
 
-        QuizTaken quizTaken = new QuizTaken();
-        quizTaken.setQuizTakenId(1);
-        when(quizTakenRepository.save(any(QuizTaken.class))).thenReturn(quizTaken);
+        when(userResponseRepository.save(any(UserResponse.class)))
+                .thenReturn(buildUserResponse);
+    }
 
-        //List<SubmitUserResponseDTO> result = userResponseService.submitUserResponses(userId, quizId);
-        CurrentAndNextResponseDTO currentAndNextResponseDTO=  buildCurrentAndNextResponseDTO();
-        ScoreDTO result = userResponseService.submitUserResponses(currentAndNextResponseDTO);
+    private void setupMockQuizTakenRepository() {
+        when(quizTakenRepository.save(any(QuizTaken.class)))
+                .thenReturn(buildMockQuizTaken());
+    }
 
+    private void verifyInteractionsWithRepositories() {
         verify(userResponseRepository, times(2)).save(any(UserResponse.class));
         verify(quizTakenRepository, times(1)).save(any(QuizTaken.class));
     }
 
+
     @Test
     public void testGetUserResponsesByQuizAndUser_ShouldReturnUserResponses() {
+        // Arrange
         Integer quizId = 1;
         Integer userId = 1;
+        mockRepositories(quizId, userId); // Mock the quiz and user repositories
 
-        when(quizRepository.findById(quizId)).thenReturn(Optional.of(new Quiz()));
-        when(applicationUserRepository.findById(userId)).thenReturn(Optional.of(new ApplicationUser()));
-
-        DisplayUserResponseDTO mockDisplayUserResponseDTO = MockUtils.mockDisplayUserResponseDTO(
-                "Integer",                // userResponseAns
-                true,                     // isCorrect
-                "What is",                // questionDescription
-                "Option 1",               // questionOption1
-                "Option 2",               // questionOption2
-                "Option 3",               // questionOption3
-                "Option 4",               // questionOption4
-                "Option 1"                // correctAns
-        );
+        DisplayUserResponseDTO mockedResponse = createMockedUserResponse(); // Create a mocked response
 
         when(userResponseRepository.findByQuizQuizIdAndApplicationUserApplicationUserId(quizId, userId))
-                .thenReturn(List.of(mockDisplayUserResponseDTO));
-
+                .thenReturn(List.of(mockedResponse));
+        // Act
         List<DisplayUserResponseDTO> result = userResponseService.getUserResponsesByQuizAndUser(quizId, userId);
+        // Assert
+        verifyUserResponse(result);
+    }
 
+    // Helper function to mock repository responses
+    private void mockRepositories(Integer quizId, Integer userId) {
+        Quiz quiz = new Quiz();
+        ApplicationUser user = new ApplicationUser();
+
+        when(quizRepository.findById(quizId)).thenReturn(Optional.of(quiz));
+        when(applicationUserRepository.findById(userId)).thenReturn(Optional.of(user));
+    }
+
+    // Helper function to create a mocked DisplayUserResponseDTO
+    private DisplayUserResponseDTO createMockedUserResponse() {
+        return MockUtils.mockDisplayUserResponseDTO(
+                "String", true, "What is", "Option 1", "Option 2", "Option 3", "Option 4", "Option 1");
+    }
+
+    // Helper function to verify user responses
+    private void verifyUserResponse(List<DisplayUserResponseDTO> result) {
         assertNotNull(result);
         assertEquals(1, result.size());
-        DisplayUserResponseDTO responseDTO = result.get(0);
 
-        assertEquals("Integer", responseDTO.getUserResponseAns());
+        DisplayUserResponseDTO responseDTO = result.get(0);
+        assertEquals("String", responseDTO.getUserResponseAns());
         assertTrue(responseDTO.getIsCorrect());
 
-        DisplayUserResponseDTO.QuestionDTO questionDTO = responseDTO.getQuestion();
+        // Verify question details
+        verifyQuestionDetails(responseDTO.getQuestion());
+    }
+
+    // Helper function to verify question details
+    private void verifyQuestionDetails(DisplayUserResponseDTO.QuestionDTO questionDTO) {
         assertEquals("What is", questionDTO.getQuestionDescription());
         assertEquals("Option 1", questionDTO.getQuestionOption1());
         assertEquals("Option 2", questionDTO.getQuestionOption2());
@@ -196,4 +206,134 @@ public class UserResponseServiceTest {
         assertEquals("Option 4", questionDTO.getQuestionOption4());
         assertEquals("Option 1", questionDTO.getQuestionCorrectAns());
     }
+
+
+
+    //build
+    private CurrentResponseDTO mockCurrentResponseDTO() {
+        Integer userResponseId = 1;
+        String userResponseAns = "Integer";
+        Integer questionId = 1;
+        String questionDescription = "What is";
+        String questionOption1 = "String";
+        String questionOption2 = "Boolean";
+        String questionOption3 = "Integer";
+        String questionOption4 = "Double";
+        Integer applicationUserId = 1;
+        String applicationUserEmail = "pooja@gmail.com";
+        String applicationUserPassword = "pooja@123";
+        String applicationUserRole = "Student";
+        Integer quizId = 1;
+        Integer quizNoOfQuestions = 10;
+        Integer quizTotalMarks = 20;
+        Integer quizTimeAllocated = 20;
+        String quizName = "EVS";
+        return MockUtils.mockCurrentResponseProjection(
+                userResponseId, userResponseAns, questionId, questionDescription, questionOption1,
+                questionOption2, questionOption3, questionOption4, applicationUserId, applicationUserEmail,
+                applicationUserPassword, applicationUserRole, quizId, quizNoOfQuestions, quizTotalMarks,
+                quizTimeAllocated, quizName);
+    }
+
+
+private QuestionDTO buildQuestionDTO() {
+    return QuestionDTO.builder()
+            .questionId(1)
+            .questionDescription("What is ")
+            .questionOption1("String")
+            .questionOption2("Boolean")
+            .questionOption3("Integer")
+            .questionOption4("Double")
+            .questionCorrectAns("Integer")
+            .questionMarks(2)
+            .build();
+}
+
+
+private ApplicationUserRegisterDTO buildApplicationUserRegisterDTO() {
+    return ApplicationUserRegisterDTO.builder()
+            .applicationUserId(1)
+            .applicationUserFirstName("Pooja")
+            .applicationUserLastName("Gulhane")
+            .applicationUserEmail("pooja@gmail.com")
+            .applicationUserPassword("pooja@123")
+            .applicationUserRole("STUDENT")
+            .build();
+}
+
+
+    private QuizDTO buildQuizDTO() {
+        return QuizDTO.builder()
+                .quizId(1)
+                .quizNoOfQuestions(10)
+                .quizTotalMarks(20)
+                .quizTimeAllocated(10)
+                .quizName("EVS")
+                .quizImage(null)
+                .build();
+    }
+
+
+    private UserResponse buildUserResponse() {
+        return UserResponse.builder()
+                .userResponseId(1)
+                .question(null)
+                .applicationUser(null)
+                .quiz(null)
+                .userResponseDateTime(0)
+                .userResponseAns("Integer")
+                .isCorrect(true)
+                .build();
+    }
+
+//    private QuizTaken buildMockQuizTaken(){
+//        ApplicationUser applicationUser = new ApplicationUser(1,null,null,null,null,null,null,null);
+//        Quiz quiz = new Quiz(1,null,null,null,null,null,null,null);
+//        return new QuizTaken(1,applicationUser, quiz, 10, null);
+//    }
+
+    private QuizTaken buildMockQuizTaken() {
+        ApplicationUser applicationUser = ApplicationUser.builder()
+                .applicationUserId(1)
+                .build();
+
+        Quiz quiz = Quiz.builder()
+                .quizId(1)
+                .build();
+
+        return QuizTaken.builder()
+                .quizTakenId(1)
+                .applicationUser(applicationUser)
+                .quiz(quiz)
+                .scoreValue(10)
+                .quizTakenDate(null) // or any desired date
+                .build();
+    }
+
+
+    private SubmitUserResponseDTO buildSubmitUserResponseDTO() {
+        return SubmitUserResponseDTO.builder()
+                .question(buildQuestionDTO())
+                .applicationUser(buildApplicationUserRegisterDTO())
+                .userResponseAns("String")
+                .quiz(buildQuizDTO())
+                .build();
+    }
+
+
+    private CurrentAndNextResponseDTO buildCurrentAndNextResponseDTO() {
+        return CurrentAndNextResponseDTO.builder()
+                .currentResponse(buildSubmitUserResponseDTO())
+                .nextResponse(buildSubmitUserResponseDTO())
+                .build();
+    }
+
+
+    private CurrentAndPreviousResponseDTO buildCurrentAndPreviousResponseDTO() {
+        return CurrentAndPreviousResponseDTO.builder()
+                .currentResponse(buildSubmitUserResponseDTO())
+                .previousResponse(buildSubmitUserResponseDTO())
+                .build();
+    }
+
 }

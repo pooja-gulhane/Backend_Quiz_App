@@ -2,10 +2,11 @@ package Ideas.QuizApp.quiz_data.DTO.Question;
 
 import lombok.*;
 
+@Builder
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class QuestionDTO {
 
     private Integer questionId;

@@ -35,7 +35,7 @@ public class SecurityConfig {
                         .ignoringRequestMatchers("/h2-console/**")
                         .disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login","/users/{id}", "/users/register", "/quiz/{id}", "/userResponses" ,"/admin/login", "/admin/register", "/h2-console/**").permitAll()
+                        .requestMatchers("/auth/login","/users/{id}", "/users/register", "/quiz/{id}", "/userResponses" ,"/admin/login", "/admin/register", "/h2-console/**","/questions").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().hasAnyRole(Roles.ROLE_STUDENT, Roles.ROLE_ADMIN)
                 )
