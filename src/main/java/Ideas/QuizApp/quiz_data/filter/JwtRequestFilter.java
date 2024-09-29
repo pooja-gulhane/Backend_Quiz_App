@@ -1,6 +1,7 @@
 package Ideas.QuizApp.quiz_data.filter;
 
 import Ideas.QuizApp.quiz_data.exception.TokenExpiredException;
+import Ideas.QuizApp.quiz_data.services.ApplicationUserDetailsService;
 import Ideas.QuizApp.quiz_data.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -10,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -23,7 +23,7 @@ import java.util.Map;
 public class JwtRequestFilter extends OncePerRequestFilter {
 
     @Autowired
-    private UserDetailsService userService;
+    private ApplicationUserDetailsService userService;
 
     @Autowired
     private JwtUtil jwtUtil;

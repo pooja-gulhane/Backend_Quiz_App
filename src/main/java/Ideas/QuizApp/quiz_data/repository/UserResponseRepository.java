@@ -21,5 +21,4 @@ public interface UserResponseRepository extends CrudRepository<UserResponse, Int
     CurrentResponseDTO findByQuizAndApplicationUserAndQuestion(Quiz quiz, ApplicationUser applicationUser, Question question);
 
     List<QuestionResponseProjection> findByApplicationUserAndQuiz(ApplicationUser user, Quiz quiz);
-    //List<UserResponse> findByUserIdAndQuizId(int userId, int quizId);
 }

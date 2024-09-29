@@ -13,4 +13,5 @@ public interface ApplicationUserRepository extends CrudRepository<ApplicationUse
 
     Boolean existsByApplicationUserEmail(String applicationUserEmail);
     UserDTO findByApplicationUserEmail(String applicationUserEmail);
+
 }
