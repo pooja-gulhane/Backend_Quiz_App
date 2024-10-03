@@ -1,7 +1,7 @@
 package Ideas.QuizApp.quiz_data.controller;
 
 
-import Ideas.QuizApp.quiz_data.DTO.Admin.AdminDTO;
+import Ideas.QuizApp.quiz_data.dto.admin.AdminDTO;
 import Ideas.QuizApp.quiz_data.entity.Admin;
 import Ideas.QuizApp.quiz_data.exception.EmailAlreadyRegisteredException;
 import Ideas.QuizApp.quiz_data.exception.InvalidCredentialsException;

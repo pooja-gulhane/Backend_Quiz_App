@@ -1,6 +1,6 @@
 package Ideas.QuizApp.quiz_data.repository;
 
-import Ideas.QuizApp.quiz_data.DTO.Question.DisplayQuestionDTO;
+import Ideas.QuizApp.quiz_data.dto.question.DisplayQuestionDTO;
 import Ideas.QuizApp.quiz_data.entity.Question;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

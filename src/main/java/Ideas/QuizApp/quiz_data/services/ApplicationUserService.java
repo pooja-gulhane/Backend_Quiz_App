@@ -1,7 +1,7 @@
 package Ideas.QuizApp.quiz_data.services;
 
-import Ideas.QuizApp.quiz_data.DTO.ApplicationUser.ApplicationUserRegisterDTO;
-import Ideas.QuizApp.quiz_data.DTO.ApplicationUser.UserDTO;
+import Ideas.QuizApp.quiz_data.dto.applicationUser.ApplicationUserRegisterDTO;
+import Ideas.QuizApp.quiz_data.dto.applicationUser.UserDTO;
 import Ideas.QuizApp.quiz_data.entity.ApplicationUser;
 import Ideas.QuizApp.quiz_data.exception.EmailAlreadyRegisteredException;
 import Ideas.QuizApp.quiz_data.exception.InvalidCredentialsException;
@@ -54,16 +54,18 @@ public class ApplicationUserService {
         }
     }
 
-    public ApplicationUserRegisterDTO updateUser(int applicationUserId, ApplicationUser applicationUser) {
-        applicationUser.setApplicationUserId(applicationUserId);
-        applicationUser.setApplicationUserPassword(passwordEncoder.encode(applicationUser.getApplicationUserPassword()));
+    public ApplicationUserRegisterDTO updateUser(ApplicationUser applicationUser) {
 
-        Optional<ApplicationUser> existingUserOptional = applicationUserRepository.findById(applicationUserId);
+        Optional<ApplicationUser> existingUserOptional = applicationUserRepository.findById(applicationUser.getApplicationUserId());
 
         if (existingUserOptional.isPresent()) {
             ApplicationUser existingUser = existingUserOptional.get();
-            applicationUser.setApplicationUserrole(existingUser.getApplicationUserrole());
-            return toApplicationDTO(applicationUserRepository.save(applicationUser));
+            existingUser.setApplicationUserFirstName(applicationUser.getApplicationUserFirstName());
+            existingUser.setApplicationUserLastName(applicationUser.getApplicationUserLastName());
+            if(!applicationUser.getApplicationUserPassword().isEmpty()) {
+                existingUser.setApplicationUserPassword(passwordEncoder.encode(applicationUser.getApplicationUserPassword()));
+            }
+            return toApplicationDTO(applicationUserRepository.save(existingUser));
         }
 
         throw new ResourceNotFound("User Id not Found");
@@ -77,6 +79,8 @@ public class ApplicationUserService {
             throw new ResourceNotFound("User with ID " + applicationUserId + " not found");
         }
     }
+
+
 
     public UserDTO getCurrentUser(String authorizationHeader) {
         String jwt = authorizationHeader.substring(7);

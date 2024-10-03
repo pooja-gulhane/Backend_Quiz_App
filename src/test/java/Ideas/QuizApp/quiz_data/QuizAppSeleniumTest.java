@@ -58,14 +58,12 @@ public class QuizAppSeleniumTest {
 
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
-        // Wait for option 1 to be visible before clicking
         WebElement option1 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("option1")));
         option1.click();
 
         Thread.sleep(2000);
         WebElement nextButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("next")));
         nextButton.click();
-
         Thread.sleep(2000);
         WebElement option2 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("option2")));
         option2.click();
@@ -95,10 +93,8 @@ public class QuizAppSeleniumTest {
         WebElement confirmButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".swal2-confirm")));
         confirmButton.click();
 
-        // Wait for the URL to change to the score page
         wait.until(ExpectedConditions.urlToBe("http://localhost:4200/score/53"));
 
-        // Verify the redirection to the score page
         String expectedUrl = "http://localhost:4200/score/53";
         String actualUrl = driver.getCurrentUrl();
         System.out.println("Redirected URL: " + actualUrl);
@@ -113,19 +109,17 @@ public class QuizAppSeleniumTest {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
         Thread.sleep(2000);
-        // Wait for the "Submit Quiz" button to be clickable
         WebElement quizHistory = wait.until(ExpectedConditions.elementToBeClickable(By.id("quizHistory")));
         quizHistory.click();
 
-        wait.until(ExpectedConditions.urlToBe("http://localhost:4200/user-response-history/52/602"));
+        wait.until(ExpectedConditions.urlToBe("http://localhost:4200/user-response-history/52/903"));
         Thread.sleep(2000);
 
         JavascriptExecutor jse = (JavascriptExecutor)driver;
         jse.executeScript("scroll(0, 280)");
 
         Thread.sleep(2000);
-        // Verify the redirection to the score page
-        String expectedUrl = "http://localhost:4200/user-response-history/52/602";
+        String expectedUrl = "http://localhost:4200/user-response-history/52/903";
         String actualUrl = driver.getCurrentUrl();
         System.out.println("Redirected URL: " + actualUrl);
         Assert.assertEquals(actualUrl, expectedUrl);
@@ -134,7 +128,6 @@ public class QuizAppSeleniumTest {
 
     @AfterMethod
     public void tearDown() {
-        // Close the browser
         if (driver != null) {
             driver.quit();
         }

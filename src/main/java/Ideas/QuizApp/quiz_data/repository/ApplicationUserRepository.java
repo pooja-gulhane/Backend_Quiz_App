@@ -1,7 +1,6 @@
 package Ideas.QuizApp.quiz_data.repository;
 
-import Ideas.QuizApp.quiz_data.DTO.ApplicationUser.ApplicationUserRegisterDTO;
-import Ideas.QuizApp.quiz_data.DTO.ApplicationUser.UserDTO;
+import Ideas.QuizApp.quiz_data.dto.applicationUser.UserDTO;
 import Ideas.QuizApp.quiz_data.entity.ApplicationUser;
 import org.springframework.data.repository.CrudRepository;
 

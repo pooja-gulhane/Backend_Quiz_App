@@ -1,8 +1,8 @@
 package Ideas.QuizApp.quiz_data.repository;
 
-import Ideas.QuizApp.quiz_data.DTO.UserResponse.CurrentResponseDTO;
-import Ideas.QuizApp.quiz_data.DTO.UserResponse.DisplayUserResponseDTO;
-import Ideas.QuizApp.quiz_data.DTO.quiztaken.QuestionResponseProjection;
+import Ideas.QuizApp.quiz_data.dto.userResponse.CurrentResponseDTO;
+import Ideas.QuizApp.quiz_data.dto.userResponse.DisplayUserResponseDTO;
+import Ideas.QuizApp.quiz_data.dto.quiztaken.QuestionResponseProjection;
 import Ideas.QuizApp.quiz_data.entity.ApplicationUser;
 import Ideas.QuizApp.quiz_data.entity.Question;
 import Ideas.QuizApp.quiz_data.entity.Quiz;

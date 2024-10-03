@@ -1,6 +1,6 @@
 package Ideas.QuizApp.quiz_data.repository;
 
-import Ideas.QuizApp.quiz_data.DTO.Admin.AdminDTO;
+import Ideas.QuizApp.quiz_data.dto.admin.AdminDTO;
 import Ideas.QuizApp.quiz_data.entity.Admin;
 import org.springframework.data.repository.CrudRepository;
 

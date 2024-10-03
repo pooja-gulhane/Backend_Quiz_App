@@ -1,7 +1,7 @@
 package Ideas.QuizApp.quiz_data.services;
 
-import Ideas.QuizApp.quiz_data.DTO.Admin.AdminDTO;
-import Ideas.QuizApp.quiz_data.DTO.ApplicationUser.UserDTO;
+import Ideas.QuizApp.quiz_data.dto.admin.AdminDTO;
+import Ideas.QuizApp.quiz_data.dto.applicationUser.UserDTO;
 import Ideas.QuizApp.quiz_data.exception.ResourceNotFound;
 import Ideas.QuizApp.quiz_data.repository.AdminRepository;
 import Ideas.QuizApp.quiz_data.repository.ApplicationUserRepository;

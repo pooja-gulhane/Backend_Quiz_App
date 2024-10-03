@@ -1,12 +1,12 @@
 package Ideas.QuizApp.quiz_data.serviceTest.projectionutils;
 
-import Ideas.QuizApp.quiz_data.DTO.ApplicationUser.UserDTO;
-import Ideas.QuizApp.quiz_data.DTO.Question.DisplayQuestionDTO;
-import Ideas.QuizApp.quiz_data.DTO.Quiz.QuizProjection;
-import Ideas.QuizApp.quiz_data.DTO.UserResponse.CurrentResponseDTO;
-import Ideas.QuizApp.quiz_data.DTO.UserResponse.DisplayUserResponseDTO;
-import Ideas.QuizApp.quiz_data.DTO.quiztaken.QuestionResponseProjection;
-import Ideas.QuizApp.quiz_data.DTO.quiztaken.UserQuizDetailsDTO;
+import Ideas.QuizApp.quiz_data.dto.applicationUser.UserDTO;
+import Ideas.QuizApp.quiz_data.dto.question.DisplayQuestionDTO;
+import Ideas.QuizApp.quiz_data.dto.quiz.QuizProjection;
+import Ideas.QuizApp.quiz_data.dto.userResponse.CurrentResponseDTO;
+import Ideas.QuizApp.quiz_data.dto.userResponse.DisplayUserResponseDTO;
+import Ideas.QuizApp.quiz_data.dto.quiztaken.QuestionResponseProjection;
+import Ideas.QuizApp.quiz_data.dto.quiztaken.UserQuizDetailsDTO;
 import Ideas.QuizApp.quiz_data.entity.Question;
 import org.mockito.Mockito;
 

@@ -30,7 +30,7 @@ public class SecurityConfig {
                         .disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/login","/users/{id}", "/users/register", "/userResponses" ,"/admin/login", "/admin/register", "/h2-console/**", "swagger-ui/index.html","/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/admin/**", "/quiz/create","/questions/create").hasRole("ADMIN")
                         .anyRequest().hasAnyRole(Roles.ROLE_STUDENT, Roles.ROLE_ADMIN)
                 )
                 .headers(headers -> headers

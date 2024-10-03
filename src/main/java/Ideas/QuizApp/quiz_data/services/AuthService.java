@@ -1,8 +1,8 @@
 package Ideas.QuizApp.quiz_data.services;
 
-import Ideas.QuizApp.quiz_data.DTO.ApplicationUser.ApplicationUserLoginDTO;
-import Ideas.QuizApp.quiz_data.DTO.ApplicationUser.UserDTO;
-import Ideas.QuizApp.quiz_data.DTO.AuthenticationResponse;
+import Ideas.QuizApp.quiz_data.dto.applicationUser.ApplicationUserLoginDTO;
+import Ideas.QuizApp.quiz_data.dto.applicationUser.UserDTO;
+import Ideas.QuizApp.quiz_data.dto.AuthenticationResponse;
 import Ideas.QuizApp.quiz_data.repository.ApplicationUserRepository;
 import Ideas.QuizApp.quiz_data.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;

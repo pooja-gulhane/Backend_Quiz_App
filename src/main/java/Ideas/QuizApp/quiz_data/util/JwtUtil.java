@@ -31,9 +31,6 @@ public class JwtUtil {
         return claimsResolver.apply(claims);
     }
 
-//    private Claims extractAllClaims(String token) {
-//        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
-//    }
 
     private Claims extractAllClaims(String token) {
         try {

@@ -1,7 +1,7 @@
 package Ideas.QuizApp.quiz_data.controller;
 
-import Ideas.QuizApp.quiz_data.DTO.ApplicationUser.ApplicationUserLoginDTO;
-import Ideas.QuizApp.quiz_data.DTO.AuthenticationResponse;
+import Ideas.QuizApp.quiz_data.dto.applicationUser.ApplicationUserLoginDTO;
+import Ideas.QuizApp.quiz_data.dto.AuthenticationResponse;
 import Ideas.QuizApp.quiz_data.services.AuthService; // Import the new AuthService
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     @Autowired
-    private AuthService authService; // Use the AuthService
+    private AuthService authService;
 
     @PostMapping("/login")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody ApplicationUserLoginDTO loginRequest) throws AuthenticationException {

@@ -1,43 +1,55 @@
 package Ideas.QuizApp.quiz_data.controller;
 
-import Ideas.QuizApp.quiz_data.DTO.ApplicationUser.ApplicationUserRegisterDTO;
-import Ideas.QuizApp.quiz_data.DTO.ApplicationUser.UserDTO;
+import Ideas.QuizApp.quiz_data.dto.applicationUser.ApplicationUserRegisterDTO;
+import Ideas.QuizApp.quiz_data.dto.applicationUser.UserDTO;
 import Ideas.QuizApp.quiz_data.entity.ApplicationUser;
 import Ideas.QuizApp.quiz_data.services.ApplicationUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin("*")
 @RestController
+@RequestMapping("/users") // Base path for all user-related endpoints
 public class ApplicationUserController {
+
     @Autowired
     private ApplicationUserService applicationUserService;
 
-    @GetMapping("/users/{id}")
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @GetMapping("/{id}")
     public ResponseEntity<ApplicationUserRegisterDTO> getUserById(@PathVariable("id") int applicationUserId) {
         ApplicationUserRegisterDTO userDTO = applicationUserService.getUserById(applicationUserId);
         return ResponseEntity.ok(userDTO);
     }
 
-    @PostMapping("/users/register")
-    public ApplicationUser registerStudent(@RequestBody ApplicationUser applicationUser) {
-        return applicationUserService.registerUser(applicationUser);
+    @PostMapping("/register")
+    public ResponseEntity<ApplicationUser> registerStudent(@RequestBody ApplicationUser applicationUser) {
+        ApplicationUser registeredUser = applicationUserService.registerUser(applicationUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(registeredUser);
     }
 
-    @PostMapping("/users/login")
-    public ApplicationUser loginStudent(@RequestBody ApplicationUserRegisterDTO applicationUser) {
-        return applicationUserService.loginUser(applicationUser);
+    @PostMapping("/login")
+    public ResponseEntity<ApplicationUser> loginStudent(@RequestBody ApplicationUserRegisterDTO applicationUser) {
+        ApplicationUser loggedInUser = applicationUserService.loginUser(applicationUser);
+        return ResponseEntity.ok(loggedInUser);
     }
 
-    @PutMapping("/users/{id}")
-    public ApplicationUserRegisterDTO updateApplicationUser(@PathVariable("id") int applicationUserId, @RequestBody ApplicationUser applicationUser) {
-        return applicationUserService.updateUser(applicationUserId, applicationUser);
+    @PutMapping
+    public ResponseEntity<ApplicationUserRegisterDTO> updateApplicationUser(@RequestBody ApplicationUser applicationUser) {
+        ApplicationUserRegisterDTO updatedUser = applicationUserService.updateUser(applicationUser);
+        return ResponseEntity.ok(updatedUser);
     }
 
-    @GetMapping("/users")
-    public UserDTO getCurrentUser(@RequestHeader("Authorization") String authorizationHeader) {
-        return applicationUserService.getCurrentUser(authorizationHeader);
+    @GetMapping
+    public ResponseEntity<UserDTO> getCurrentUser(@RequestHeader("Authorization") String authorizationHeader) {
+        UserDTO currentUser = applicationUserService.getCurrentUser(authorizationHeader);
+        return ResponseEntity.ok(currentUser);
     }
 }
+
 

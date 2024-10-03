@@ -1,7 +1,7 @@
 package Ideas.QuizApp.quiz_data.services;
 
-import Ideas.QuizApp.quiz_data.DTO.Question.DisplayQuestionDTO;
-import Ideas.QuizApp.quiz_data.DTO.Question.QuestionDTO;
+import Ideas.QuizApp.quiz_data.dto.question.DisplayQuestionDTO;
+import Ideas.QuizApp.quiz_data.dto.question.QuestionDTO;
 import Ideas.QuizApp.quiz_data.entity.ApplicationUser;
 import Ideas.QuizApp.quiz_data.entity.Question;
 import Ideas.QuizApp.quiz_data.entity.Quiz;
@@ -14,7 +14,6 @@ import Ideas.QuizApp.quiz_data.repository.UserResponseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,17 +46,15 @@ public class QuestionService {
         if (quiz.getQuizNoOfQuestions() - currentQuestionCount >= questions.size()) {
             return (List<Question>) questionRepository.saveAll(questions);
         }
-
         throw new QuestionLimitExceededException();
     }
 
-    public QuestionDTO updateQuestion(int questionId, Question updatedQuestion) {
-        Optional<Question> existingQuestionOptional = questionRepository.findById(questionId);
+    public QuestionDTO updateQuestion(Question updatedQuestion) {
+        Optional<Question> existingQuestionOptional = questionRepository.findById(updatedQuestion.getQuestionId());
 
         if (existingQuestionOptional.isPresent()) {
             Question existingQuestion = existingQuestionOptional.get();
 
-            // Update the fields of the existing question with the new values
             existingQuestion.setQuestionDescription(updatedQuestion.getQuestionDescription());
             existingQuestion.setQuestionOption1(updatedQuestion.getQuestionOption1());
             existingQuestion.setQuestionOption2(updatedQuestion.getQuestionOption2());
@@ -66,7 +63,6 @@ public class QuestionService {
             existingQuestion.setQuestionCorrectAns(updatedQuestion.getQuestionCorrectAns());
             existingQuestion.setQuestionMarks(updatedQuestion.getQuestionMarks());
 
-            // Save the updated question back to the database
             return buildUpdateQuestionDTO(questionRepository.save(existingQuestion));
         }
         throw new ResourceNotFound("Question Not Found");
@@ -95,12 +91,12 @@ public class QuestionService {
                 question.setQuestionId(questionDTO.getQuestionId());
                 ApplicationUser applicationUser = new ApplicationUser();
                 applicationUser.setApplicationUserId(userId);
-                Quiz quiz1 = new Quiz();
-                quiz1.setQuizId(quizId);
+                Quiz setQuiz = new Quiz();
+                setQuiz.setQuizId(quizId);
 
-                boolean isResponsePresent = userResponseRepository.existsByQuizAndApplicationUserAndQuestion(quiz1, applicationUser, question);
+                boolean isResponsePresent = userResponseRepository.existsByQuizAndApplicationUserAndQuestion(setQuiz, applicationUser, question);
                 if(!isResponsePresent) {
-                    UserResponse userResponse = new UserResponse(0, question, applicationUser, "", 0, quiz1, false);
+                    UserResponse userResponse = new UserResponse(0, question, applicationUser, "", 0, setQuiz, false);
                     userResponseRepository.save(userResponse);
                 }
             }

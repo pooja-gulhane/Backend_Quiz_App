@@ -1,8 +1,8 @@
 package Ideas.QuizApp.quiz_data.services;
 
-import Ideas.QuizApp.quiz_data.DTO.UserResponse.*;
-import Ideas.QuizApp.quiz_data.DTO.quiztaken.QuestionResponseProjection;
-import Ideas.QuizApp.quiz_data.DTO.quiztaken.ScoreDTO;
+import Ideas.QuizApp.quiz_data.dto.userResponse.*;
+import Ideas.QuizApp.quiz_data.dto.quiztaken.QuestionResponseProjection;
+import Ideas.QuizApp.quiz_data.dto.quiztaken.ScoreDTO;
 import Ideas.QuizApp.quiz_data.entity.*;
 import Ideas.QuizApp.quiz_data.exception.ResourceNotFound;
 import Ideas.QuizApp.quiz_data.repository.*;
@@ -39,7 +39,6 @@ public class UserResponseService {
         Quiz quiz = new Quiz();
         quiz.setQuizId(currentResponse.getQuiz().getQuizId());
 
-        // Checking if response is given or not for that question.
         boolean ans = userResponseRepository.existsByQuizAndApplicationUserAndQuestion(quiz, user, question);
 
         if (ans) {
@@ -48,14 +47,6 @@ public class UserResponseService {
                     .orElseThrow(() -> new RuntimeException("Response not found"));
 
             userResponse.setUserResponseAns(currentResponse.getUserResponseAns());
-            userResponseRepository.save(userResponse);
-        } else {
-            UserResponse userResponse = new UserResponse();
-            userResponse.setQuestion(question);
-            userResponse.setApplicationUser(user);
-            userResponse.setQuiz(quiz);
-            userResponse.setUserResponseAns(currentResponse.getUserResponseAns());
-
             userResponseRepository.save(userResponse);
         }
     }
@@ -98,49 +89,72 @@ public class UserResponseService {
         saveCurrentResponse(currentAndNextResponseDTO.getCurrentResponse());
         getNextResponseIfPresent(currentAndNextResponseDTO.getNextResponse());
 
+        ApplicationUser user = extractUser(currentAndNextResponseDTO);
+        Quiz quiz = extractQuiz(currentAndNextResponseDTO);
+
+        int score = calculateScore(user, quiz);
+        saveQuizTaken(user, quiz, score);
+
+        return new ScoreDTO(score);
+    }
+
+    private ApplicationUser extractUser(CurrentAndNextResponseDTO currentAndNextResponseDTO) {
         ApplicationUser user = new ApplicationUser();
         user.setApplicationUserId(currentAndNextResponseDTO.getCurrentResponse().getApplicationUser().getApplicationUserId());
+        return user;
+    }
+
+    private Quiz extractQuiz(CurrentAndNextResponseDTO currentAndNextResponseDTO) {
         Quiz quiz = new Quiz();
         quiz.setQuizId(currentAndNextResponseDTO.getCurrentResponse().getQuiz().getQuizId());
+        return quiz;
+    }
 
-
+    private int calculateScore(ApplicationUser user, Quiz quiz) {
         int score = 0;
         List<QuestionResponseProjection> questionResponseProjections = userResponseRepository.findByApplicationUserAndQuiz(user, quiz);
+
         for (QuestionResponseProjection questionResponseProjection : questionResponseProjections) {
-            UserResponse userResponse = userResponseRepository.findById(questionResponseProjection.getUserResponseId())
-                    .orElseThrow(() -> new RuntimeException("Response not existed"));
-            userResponse.setIsCorrect(questionResponseProjection.getUserResponseAns().equals(questionResponseProjection.getQuestion().getQuestionCorrectAns()));
-            userResponse.setUserResponseDateTime(LocalDateTime.now());
-
-            userResponseRepository.save(userResponse);
-            score += userResponse.getIsCorrect() ? questionResponseProjection.getQuestion().getQuestionMarks() : 0;
+            score += evaluateUserResponse(questionResponseProjection);
         }
+        return score;
+    }
 
+    private int evaluateUserResponse(QuestionResponseProjection questionResponseProjection) {
+        UserResponse userResponse = userResponseRepository.findById(questionResponseProjection.getUserResponseId())
+                .orElseThrow(() -> new RuntimeException("Response not existed"));
+
+        boolean isCorrect = questionResponseProjection.getUserResponseAns().equals(questionResponseProjection.getQuestion().getQuestionCorrectAns());
+        userResponse.setIsCorrect(isCorrect);
+        userResponse.setUserResponseDateTime(LocalDateTime.now());
+
+        userResponseRepository.save(userResponse);
+
+        return isCorrect ? questionResponseProjection.getQuestion().getQuestionMarks() : 0;
+    }
+
+    private void saveQuizTaken(ApplicationUser user, Quiz quiz, int score) {
         QuizTaken quizTaken = new QuizTaken();
         quizTaken.setApplicationUser(user);
         quizTaken.setQuiz(quiz);
         quizTaken.setScoreValue(score);
         quizTaken.setQuizTakenDate(LocalDateTime.now());
         quizTakenRepository.save(quizTaken);
-
-        return new ScoreDTO(score);
     }
 
 
+
     public List<DisplayUserResponseDTO> getUserResponsesByQuizAndUser(Integer quizId, Integer userId) {
-        // Check if Quiz exists
         Optional<Quiz> quizOptional = quizRepository.findById(quizId);
         if (quizOptional.isEmpty()) {
             throw new ResourceNotFound("Quiz Not Found");
         }
 
-        // Check if User exists
         Optional<ApplicationUser> userOptional = applicationUserRepository.findById(userId);
         if (userOptional.isEmpty()) {
             throw new ResourceNotFound("User Not Found");
         }
 
-        // Fetch user responses if both Quiz and User exist
         return userResponseRepository.findByQuizQuizIdAndApplicationUserApplicationUserId(quizId, userId);
     }
 }
